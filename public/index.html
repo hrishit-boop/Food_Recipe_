@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input { width: 300px; padding: 0.5rem; }
+    button { padding: 0.5rem; margin-left: 0.5rem; }
+    .recipe { margin-top: 1.5rem; }
+    .recipe img { display: block; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Recipe Finder</h1>
+  <input type="text" id="ingredients" placeholder="e.g. chicken, rice">
+  <button id="search">Search</button>
+  <div id="results"></div>
+
+  <script>
+    document.getElementById('search').addEventListener('click', async () => {
+      const ingredients = document.getElementById('ingredients').value;
+      const response = await fetch(`/recipes?ingredients=${encodeURIComponent(ingredients)}`);
+      const hits = await response.json();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      if (hits.error) {
+        resultsDiv.textContent = hits.error;
+        return;
+      }
+
+      hits.forEach(hit => {
+        const { label, image, url } = hit.recipe;
+        const div = document.createElement('div');
+        div.className = 'recipe';
+        div.innerHTML = `
+          <h3><a href="${url}" target="_blank">${label}</a></h3>
+          <img src="${image}" alt="${label}" width="200">
+        `;
+        resultsDiv.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
